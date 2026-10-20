@@ -1,0 +1,31 @@
+{
+  "question": "Can a class-balanced LightGBM model with cross-validated tuning, averaged over several few-shot episodes, beat a neural-network stand-in for the paper's residual-SE few-shot detector on a public sensor-based activity dataset with only 10 labelled examples per class?",
+  "method": "UCI HAR (OpenML 1478) as stand-in for road-alert sensor signals. 5 episodes of 10-shot-per-class training sampling from a stratified 70% pool; evaluation on the held-out 30% test split. Baseline: MLPClassifier on standardized features. Improved: class-balanced LightGBM with 3-fold stratified CV grid search inside each few-shot set. Metric: macro-F1 on the test split.",
+  "dataset": {
+    "name": "har",
+    "source_url": "https://www.openml.org/d/1478",
+    "n_rows": 10299,
+    "n_train": 7209,
+    "n_test": 3090,
+    "same_as_paper": false,
+    "baseline_is_papers_method": false
+  },
+  "metric_name": "macro-F1 (test)",
+  "higher_is_better": true,
+  "baseline": "MLPClassifier (256 hidden units, standardized inputs), stand-in for residual-SE network",
+  "improved": "Class-balanced LightGBM; num_leaves, n_estimators and min_child_samples chosen by 3-fold stratified CV on the few-shot training set only",
+  "metrics": {
+    "baseline_score": 0.8036861271709291,
+    "improved_score": 0.8147722432125857,
+    "improvement": 0.011086116041656546,
+    "baseline_score_std": 0.012730798938139795,
+    "improved_score_std": 0.03162760977912443,
+    "baseline_accuracy": 0.8018770226537215,
+    "improved_accuracy": 0.8206472491909385,
+    "baseline_balanced_accuracy": 0.8043321508336942,
+    "improved_balanced_accuracy": 0.8184760868287924,
+    "train_shots_per_class": 10,
+    "n_episodes": 5
+  },
+  "notes": "OpenML 1478 is distributed as one combined table, so the official UCI train/test split is not recoverable; a single stratified 70/30 split (seed 42) is used instead. This is a stand-in dataset, not the paper's road-alert signals, and the MLP is a generic stand-in, not a reproduction of the residual-SE network. Results come from 5 episodes only, so differences may be within noise; std is over episodes."
+}
