@@ -1,7 +1,9 @@
 """Few-shot HAR benchmark: MLP baseline (stand-in for residual-SE net) vs class-balanced LightGBM with inner-CV tuning."""
 import io
 import json
+import os
 import sys
+import tempfile
 import time
 import warnings
 
@@ -50,7 +52,16 @@ def get(url):
 def load_data():
     # Fetch OpenML metadata, then the ARFF file; parse numeric features and the target column
     desc = json.loads(get(API.format(DATA_ID)))["data_set_description"]
-    data, _ = arff.loadarff(io.BytesIO(get(desc["url"])))
+    raw = get(desc["url"])
+    # Recent SciPy versions only accept text in the ARFF header parser, so write the
+    # downloaded bytes to a temporary file and let loadarff open it in text mode.
+    with tempfile.NamedTemporaryFile(suffix=".arff", delete=False) as tmp:
+        tmp.write(raw)
+        tmp_path = tmp.name
+    try:
+        data, _ = arff.loadarff(tmp_path)
+    finally:
+        os.remove(tmp_path)
     target = desc["default_target_attribute"]
     feats = [n for n in data.dtype.names if n != target]
     X = np.column_stack([data[n] for n in feats]).astype(float)
@@ -120,7 +131,6 @@ def main():
         sys.exit("non-finite metrics; cannot produce meaningful results")
 
     # Chart: macro-F1 per model (mean +/- std over episodes)
-    import os
     os.makedirs("figures", exist_ok=True)
     fig, ax = plt.subplots(figsize=(5, 4))
     ax.bar(["MLP baseline", "LightGBM (CV)"], [b_mean[0], i_mean[0]],

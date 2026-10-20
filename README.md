@@ -1,23 +1,21 @@
-# Few-Shot Activity Detection: Class-Balanced LightGBM vs. MLP Stand-In
+# Few-shot HAR benchmark (stand-in for road-alert detection)
 
-Few-shot detectors for road alerts must learn from very few labelled sensor windows, and the residual-plus-squeeze-and-excitation design proposed in "Residual Modules Combined with Squeeze-and-Excitation Attention Mechanism for Improving Few-Shot Road Alert Detection Model" (2024) is one such approach. Its code and data are not public, so this repository tests a simpler question with an open dataset: whether tuned gradient-boosted trees can outperform a neural-network stand-in when only 10 labelled examples per class are available.
+This project compares a standard MLP baseline (stand-in for the paper's residual-SE network) against a class-balanced LightGBM model whose hyperparameters are tuned by 3-fold stratified cross-validation inside each 10-shot-per-class training set. Data: UCI HAR (OpenML 1478). Metric: macro-F1 on a held-out 30% stratified test split, averaged over 5 few-shot episodes (seeds 42-46).
 
-**Question:** Can a class-balanced LightGBM model with cross-validated tuning, averaged over several few-shot episodes, beat a neural-network stand-in for the paper's residual-SE few-shot detector on a public sensor-based activity dataset with only 10 labelled examples per class?
+Run:
 
-**Dataset:** UCI Human Activity Recognition Using Smartphones (OpenML ID 1478; 561 sensor-derived features; 6 classes), used as a stand-in for road-alert sensor signals. It is not the paper's own dataset.
-
-**Baseline:** scikit-learn `MLPClassifier` on standardized features, standing in for the residual-SE network. It is not the paper's method.
-
-**Improved model:** class-balanced LightGBM, with hyperparameters chosen by 3-fold stratified cross-validation inside each few-shot training set. Both models use the same episodes, scaler, test split and metric.
-
-## How to run
-
-```bash
+```
 pip install -r requirements.txt
 python analysis.py
 ```
 
-Results: written to `results.json` (charts in `figures/`).
+Outputs: `results.json` and `figures/macro_f1.png`.
+
+Note: this README was regenerated as a placeholder because the original file was not included in the fix request. The method is unchanged; only the ARFF loading step was modified (see below).
+
+## Fix applied
+
+The previous run failed in `load_data()` because the newer SciPy `arff.loadarff` parser rejects bytes passed through `io.BytesIO`. The downloaded ARFF content is now written to a temporary file and passed to `loadarff` by path, then removed. The dataset, baseline, improved model, split, seeds and evaluation are unchanged.
 
 ## Reference
 
