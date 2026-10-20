@@ -17,6 +17,28 @@ Note: this README was regenerated as a placeholder because the original file was
 
 The previous run failed in `load_data()` because the newer SciPy `arff.loadarff` parser rejects bytes passed through `io.BytesIO`. The downloaded ARFF content is now written to a temporary file and passed to `loadarff` by path, then removed. The dataset, baseline, improved model, split, seeds and evaluation are unchanged.
 
+## Results (latest run)
+
+On the public UCI HAR dataset, a standard MLP stand-in for the residual-SE network reached 80.4% macro-F1 with 10 shots per class, while class-balanced LightGBM reached 81.5%, a small gain within episode noise over 5 episodes.
+
+| Metric | Value |
+|---|---|
+| baseline_score | 0.8037 |
+| improved_score | 0.8148 |
+| improvement | 0.01109 |
+| baseline_score_std | 0.01273 |
+| improved_score_std | 0.03163 |
+| baseline_accuracy | 0.8019 |
+| improved_accuracy | 0.8206 |
+| baseline_balanced_accuracy | 0.8043 |
+| improved_balanced_accuracy | 0.8185 |
+| train_shots_per_class | 10 |
+| n_episodes | 5 |
+
+Run on 2026-10-20. Full output: [results.json](results.json) · [run.log](run.log)
+
+Notes: OpenML 1478 is distributed as one combined table, so the official UCI train/test split is not recoverable; a single stratified 70/30 split (seed 42) is used instead. This is a stand-in dataset, not the paper's road-alert signals, and the MLP is a generic stand-in, not a reproduction of the residual-SE network. Results come from 5 episodes only, so differences may be within noise; std is over episodes.
+
 ## Reference
 
 This project is motivated by the following paper:
